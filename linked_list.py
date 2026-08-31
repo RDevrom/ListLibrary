@@ -161,10 +161,5 @@ class pivo():
             left += 1
             right -= 1
 
-    # def insert(self,index,element):
-
-
-    # def sort(self):
-
 if __name__ == "__main__":
     exit("бро если что это библиотека☠️")
