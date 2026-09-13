@@ -1,34 +1,38 @@
-class FunctionError(Exception): # класс ошибки для неправильного выполнения функций списка
+class FunctionError(Exception):
     pass
 
-class CreateListError(Exception): # класс ошибки для неверного создания списка
+class CreateListError(Exception):
     pass
 
-class pivo():
+class table():
     def __new__(cls,*args):
-        # print(args)
-        if isinstance(args[1],pivo) or args[1] is None:
+        if isinstance(args[1],table) or args[1] is None: # args[1] is ".next" field. args[0] is .data field.
             return super().__new__(cls)
         else:
-            raise CreateListError("спрашивай у вери ти все что пожелаешь...") # знает где ты жиь
+            raise CreateListError(".next must be an instance of table or None")
         
     
-    def __init__(self,data,next):
+    def __init__(self,data,next) -> None:
         self.data = data
         self.next = next
 
-    def __clear__(self):
+    def __clear__(self) -> None:
+        """
+        Service function.
+        """
         curr = self
-        temp = pivo(None,None)
+        temp = table(None,None)
         while curr:
             if curr.data is not None:
                 temp.append(curr.data)
             curr = curr.next
         self.data = temp.data
         self.next = temp.next
-        del temp
 
     def length(self) -> int:
+        """
+        Returns length of your table.
+        """
         self.__clear__()
         curr,count = self,0
         while curr:
@@ -36,9 +40,12 @@ class pivo():
             curr = curr.next
         return count
 
-    def change(self,index,element):
+    def change(self,index:int,element) -> None:
+        """
+        Changes .data on {index} to {element}.
+        """
         if index >= self.length() or index < 0:
-            raise FunctionError("somethi ging is cuming in thre(twpo) days/.")
+            raise IndexError
         count = 0
         curr = self
         while curr:
@@ -48,28 +55,36 @@ class pivo():
             curr = curr.next
             count += 1
 
-    def append(self,element):
+    def append(self,element) -> None:
+        """
+        Adds {element} at the end of the table.
+        """
         curr = self
         if self.data:
             while curr.next:
                 curr = curr.next
-            curr.next = pivo(element,None)
-        else: # если длина - 0(нет вообще ничего, список буквально pivo(None,None)), то заменяет data
+            curr.next = table(element,None)
+        else: # если длина - 0(нет вообще ничего, список буквально table(None,None)), то заменяет data
             self.data = element
 
-    def ind(self,num:int) -> int:
-        if num >= self.length():
+    def ind(self,index:int) -> int:
+        """
+        Returns an element from {index}.
+        """
+        if index >= self.length():
             raise IndexError
         self.__clear__()
         curr,count = self,0
         while curr:
-            if num == count:
+            if index == count:
                 return curr.data
             curr = curr.next
             count += 1
-        raise FunctionError("ьы тупой такогьо нет") # знает где ты живёшь
 
     def index(self,element):
+        """
+        Returns index of {element}.
+        """
         self.__clear__()
         curr,count = self,0
         while curr:
@@ -77,11 +92,19 @@ class pivo():
                 return count
             count += 1
             curr = curr.next
+        raise FunctionError("There is no element here")
 
+    def pop(self,index:int = None) -> None:
+        """
+        Returns element that will be removed.
 
-    def pop(self,index = None) -> None:
-        if not isinstance(index,int) and index != None or self.data == None:
-            raise FunctionError("за тобой идут.") # нашли у подмостка веритев.
+        If {index} == None or you have left blank call of a method removes last element of the table.
+        Elif {index} is an instance of non-negative integer removes element on {index}.
+        """
+        if not isinstance(index,int) and index != None:
+            raise IndexError
+        if self.data == None:
+            raise FunctionError("Empty table")
         if index == None:
             if self.next != None:
                 curr = self
@@ -95,9 +118,11 @@ class pivo():
                 self.data = None
                 return olddata
         else:
-            if index >= self.length() or index < 0 or not self.data:
-                raise FunctionError("somethi ging is cuming in thre days/.") # somet hing cruel
-            if index > 0: #TODO НЕРАБОЧЕЕ ГОВНО ПОТОМУ ЧТО ДОПУСТИМ ЕСТЬ "1,2,3" УДАЛЯЮ ИНДЕКС ПЕРВЫЙ ПОЛУЧАЕТСЯ СПИСОК "1" НУ КОРОЧЕ ОТВЯЗЫВАЕТ И СДЕЛАЙ ТАК ЧТОБЫ ОН ПРОСТО NONE СТАНОВИЛСЯ И ВСЁ В ПРИЦНИПЕ НУ SELF.DATA
+            if index >= self.length() or index < 0:
+                raise IndexError
+            if not self.data:
+                raise FunctionError("Empty table")
+            if index > 0:
                 curr = self
                 count = 0
                 while count != index:
@@ -112,27 +137,39 @@ class pivo():
                 return olddata
 
     def copy(self):
+        """
+        Returns an independent copy of table.
+        """
         self.__clear__()
-        a = pivo(None,None)
+        a = table(None,None)
         b = a
         curr = self
         while curr:
-            b.next = pivo(curr.data,None)
+            b.next = table(curr.data,None)
             b = b.next
             curr = curr.next
         return a
     
-    def clear(self):
+    def clear(self) -> None:
+        """
+        Clears table
+        """
         self.data = self.next = None
 
-    def extend(self,massive:list):
+    def extend(self,massive:list) -> None:
+        """
+        Add items from iterable {massive}
+        """
         if not any((isinstance(massive, tuple),isinstance(massive, dict),isinstance(massive, list),isinstance(massive, set),isinstance(massive, frozenset))):
-            raise FunctionError("я знаю где ты живешь.") # (вери ти.)
+            raise ValueError("Argument must be a massive")
 
         for i in massive:
             self.append(i)
 
-    def println(self):
+    def println(self) -> None:
+        """
+        Prints table
+        """
         self.__clear__()
         curr = self
         while curr:
@@ -142,13 +179,22 @@ class pivo():
                 print(curr.data)
             curr = curr.next
 
-    def remove(self,element):
+    def remove(self,element) -> None:
+        """
+        Removes {element} from table
+        """
         if element == None:
-            raise FunctionError("ты еблан?")
-        i = self.index(element)
-        self.pop(i)
+            raise ValueError("Argument can't be None")
+        curr = self
+        while curr:
+            if curr.data == element:
+                curr.data = None
+        raise FunctionError("There is no element here")
 
-    def count(self,element):
+    def count(self,element) -> int:
+        """
+        Counts {element} in table and returns its quantity
+        """
         self.__clear__()
         curr = self
         score = 0
@@ -158,7 +204,10 @@ class pivo():
             curr = curr.next
         return score
 
-    def reverse(self):
+    def reverse(self) -> None:
+        """
+        Reversing table's elements
+        """
         prev = None
         curr = self
         while curr:
@@ -166,31 +215,38 @@ class pivo():
             curr = curr.next
             tmp.next = prev
             prev = tmp
-        return prev
+        self.data = prev.data
+        self.next = prev.next
 
     def centre(self):
+        """
+        Returns centre of table
+        """
         slow = fast = self
         while fast and fast.next:
             slow = slow.next
             fast = fast.next.next
         return slow
 
-    def insert(self,index,element):
+    def insert(self,index:int,element) -> None:
+        """
+        Inserts {element} on {index}
+        """
         if index < 0:
-            raise FunctionError("здесь кто то здесь?")
-        # if index >= self.length():
-        #     self.append(element)
-        #     return
+            raise FunctionError("Index can't be negative")
         curr = self
         count = 0
-        while count != index:
+        while count != index and curr.next:
             count += 1
             curr = curr.next
+        if not curr.next:
+            curr.next = table(element,None)
+            return
         olddata,oldnext = curr.data,curr.next
         curr.data = element
-        curr.next = pivo(olddata,oldnext)
+        curr.next = table(olddata,oldnext) 
 
     # def sort(self):
-import time
+
 if __name__ == "__main__":
-    # exit("бро если что это библиотека☠️")
+    exit("bro it's a library btw(arch)☠️")
